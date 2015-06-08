@@ -3,3 +3,5 @@ zf_eye_nuclei_segmentation
 
 #ignore output
 *.csv
+*.xlsx
+*.tif
