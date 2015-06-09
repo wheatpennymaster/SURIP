@@ -72,10 +72,13 @@ public class driver
 			Global.inPath = args[0];
 			Global.outPath = args[1];
 			Global.dist = Double.parseDouble(args[3]);
+			Global.csv = args[2];
 
 			System.out.println("Reading in .csv and image filenames.");
 
 			String[][]input = read_csv(args[2]);
+			Global.csvfile = input;
+
 			Nuclei[]nuclei = new Nuclei[input.length-1];
 			for(int i=0;i<nuclei.length;i++)
 				nuclei[i] = new Nuclei(input[i+1]);

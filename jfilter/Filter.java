@@ -7,6 +7,9 @@ import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+
 public class Filter
 {
 	Nuclei[]nuclei;
@@ -39,6 +42,7 @@ public class Filter
 			i=last;
 		}
 		go();
+		write_csv();
 	}
 
 	void go()
@@ -116,8 +120,9 @@ public class Filter
 				}
 			}
 			if(del)
-			{	//4 pixel radius
+			{	//4 pixel square
 				count++;
+				Global.csvfile[i][1] = "-1";
 				//System.out.println("Removing nuclei " + nuclei[i].number + " from image " + nuclei[i].image + " by editing file " + filenames.get(Integer.parseInt(nuclei[i].image)-1) );
 
 				BufferedImage cur = images[Integer.parseInt(nuclei[i].image)-1];
@@ -135,6 +140,9 @@ public class Filter
 				images[Integer.parseInt(nuclei[i].image)-1] = edit;
 			}
 		}
+
+		System.out.println("Finished filter. " + count + " nuclei removed.");
+		System.out.println("Writing files.");
 
 		try
 		{
@@ -163,7 +171,33 @@ public class Filter
 			}
 		} catch(Exception e){}
 
-		System.out.println("Finished filter. " + count + " nuclei removed.");
+	}
+
+	void write_csv()
+	{
+		try
+		{
+			String filename = Global.csv;
+			File file = new File(Global.outPath + filename);
+			if (!file.exists())
+				file.createNewFile();
+			FileWriter fw = new FileWriter(file.getAbsoluteFile());
+			BufferedWriter bw = new BufferedWriter(fw);
+			for(int i=0;i<Global.csvfile.length;i++)
+			{
+				String writeMe = "";
+				if(!(Global.csvfile[i][1].equals("-1")))
+				{
+					for(int j=0;j<Global.csvfile[i].length;j++)
+					{
+						writeMe = writeMe + Global.csvfile[i][j] + ",";
+					}
+					bw.write(writeMe + "\n");
+				}
+			}
+		} catch(Exception e){}
+				
+		System.out.println("Done writing.");			
 	}
 
 	void getImages()
