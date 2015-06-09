@@ -5,3 +5,4 @@ zf_eye_nuclei_segmentation
 *.csv
 *.xlsx
 *.tif
+*.png

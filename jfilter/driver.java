@@ -50,10 +50,10 @@ public class driver
 
 		try
 		{
-			File[] f = new File("images/").listFiles();
+			File[] f = new File(Global.inPath).listFiles();
 			for (File file : f)
 			{
-				if (file != null && file.getName().toLowerCase().endsWith(".tif"))
+				if (file != null && file.getName().toLowerCase().endsWith(".png"))
 					resultList.add(file.getCanonicalPath());
 			}
 		}
@@ -64,11 +64,18 @@ public class driver
 
 	public static void main(String[]args)
 	{
-		if(args.length == 0)
-			System.out.println("Need to specify input file.");
+		//java driver inPath outPath input_csv.csv dist
+		if(args.length < 4)
+			System.out.println("Usage:\njava driver inPath outPath path_to_input_csv.csv dist");
 		else
 		{
-			String[][]input = read_csv(args[0]);
+			Global.inPath = args[0];
+			Global.outPath = args[1];
+			Global.dist = Double.parseDouble(args[3]);
+
+			System.out.println("Reading in .csv and image filenames.");
+
+			String[][]input = read_csv(args[2]);
 			Nuclei[]nuclei = new Nuclei[input.length-1];
 			for(int i=0;i<nuclei.length;i++)
 				nuclei[i] = new Nuclei(input[i+1]);

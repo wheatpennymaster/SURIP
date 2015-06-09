@@ -9,7 +9,7 @@ public class Nuclei
 	{
 		image = input[0];
 		number = Integer.parseInt(input[1]);
-		x = Double.parseDouble(input[2]);
-		y = Double.parseDouble(input[3]);
+		x = Double.parseDouble(input[3]);
+		y = Double.parseDouble(input[4]);
 	}
 }
