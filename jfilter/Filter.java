@@ -10,6 +10,7 @@ import javax.imageio.ImageIO;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 
+import java.util.Arrays;
 public class Filter
 {
 	Nuclei[]nuclei;
@@ -41,13 +42,15 @@ public class Filter
 			i_nuclei[cur_image] = new Image_nuclei(temp2);
 			i=last;
 		}
+		getImages();
 		go();
+		//goAgain();
+		write_images();
 		write_csv();
 	}
 
 	void go()
 	{
-		getImages();
 		System.out.println("Starting filter.");
 		int count = 0;
 
@@ -142,8 +145,62 @@ public class Filter
 		}
 
 		System.out.println("Finished filter. " + count + " nuclei removed.");
-		System.out.println("Writing files.");
+	}
 
+	void goAgain()
+	{
+		System.out.println("Starting second filter.");
+		int count = 0;
+
+		for(int i=0;i<nuclei.length;i++)
+		{
+			double[]mins = new double[Global.num_neighbors];
+			for(int m=0;m<mins.length;m++)
+				mins[m] = Double.MAX_VALUE;
+			double sum = 0;
+			if(i_nuclei[Integer.parseInt(nuclei[i].image)].nuclei.length > Global.min_neighbors)
+			{
+				for(int j=0;j<i_nuclei[Integer.parseInt(nuclei[i].image)].nuclei.length;j++)
+				{
+					double dadist = Math.pow( Math.pow(nuclei[i].x - i_nuclei[Integer.parseInt(nuclei[i].image)].nuclei[j].x,2) + Math.pow(nuclei[i].y - i_nuclei[Integer.parseInt(nuclei[i].image)].nuclei[j].y,2),.5);
+					Arrays.sort(mins);
+					if(mins[mins.length-1]>dadist)
+						mins[mins.length-1] = dadist;
+				}
+				for(int j=0;j<mins.length;j++)
+				{
+					sum = sum + mins[j];
+					//System.out.println(sum);
+				}
+			}
+			//System.out.println(sum);
+			if(sum>Global.min_dist)
+			{
+				count++;
+				Global.csvfile[i][1] = "-1";
+				//System.out.println("Removing nuclei " + nuclei[i].number + " from image " + nuclei[i].image + " by editing file " + filenames.get(Integer.parseInt(nuclei[i].image)-1) );
+
+				BufferedImage cur = images[Integer.parseInt(nuclei[i].image)-1];
+				BufferedImage edit = images[Integer.parseInt(nuclei[i].image)-1];
+
+				int pixel = cur.getRGB((int) (nuclei[i].x),(int) (nuclei[i].y));
+				for(int xx=((int) (nuclei[i].x))-4;xx<((int) (nuclei[i].x))+4;xx++)
+				{
+					for(int yy=((int) (nuclei[i].y))-4;yy<((int) (nuclei[i].y))+4;yy++)
+					{
+						if(cur.getRGB(xx,yy)==pixel)
+							edit.setRGB(xx,yy,0);
+					}
+				}
+				images[Integer.parseInt(nuclei[i].image)-1] = edit;	 
+			}
+		}	
+		System.out.println("Finished second filter. " + count + " nuclei removed.");
+	}
+
+	void write_images()
+	{
+		System.out.println("Writing images.");
 		try
 		{
 			int white = new Color(255,255,255).getRGB();
@@ -170,11 +227,12 @@ public class Filter
 				ImageIO.write(images[i], "png", new File(new_path));
 			}
 		} catch(Exception e){}
-
+		System.out.println("Finished writing images.");
 	}
 
 	void write_csv()
 	{
+		System.out.println("Writing csv.");
 		try
 		{
 			String filename = Global.csv;
@@ -197,7 +255,7 @@ public class Filter
 			}
 		} catch(Exception e){}
 				
-		System.out.println("Done writing.");			
+		System.out.println("Finished writing csv.");			
 	}
 
 	void getImages()

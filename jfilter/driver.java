@@ -64,8 +64,8 @@ public class driver
 
 	public static void main(String[]args)
 	{
-		//java driver inPath outPath input_csv.csv dist
-		if(args.length < 4)
+		//java driver inPath outPath input_csv.csv dist num_neighbors min_neighbors min_dist
+		if(args.length < 7)
 			System.out.println("Usage:\njava driver inPath outPath path_to_input_csv.csv dist");
 		else
 		{
@@ -73,6 +73,9 @@ public class driver
 			Global.outPath = args[1];
 			Global.dist = Double.parseDouble(args[3]);
 			Global.csv = args[2];
+			Global.num_neighbors = Integer.parseInt(args[4]);
+			Global.min_neighbors = Integer.parseInt(args[5]);
+			Global.min_dist = Double.parseDouble(args[6]);
 
 			System.out.println("Reading in .csv and image filenames.");
 
