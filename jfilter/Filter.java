@@ -43,8 +43,8 @@ public class Filter
 			i=last;
 		}
 		getImages();
-		go();
-		//goAgain();
+		//go();
+		goAgain();
 		write_images();
 		write_csv();
 	}
@@ -132,15 +132,18 @@ public class Filter
 				BufferedImage edit = images[Integer.parseInt(nuclei[i].image)-1];
 
 				int pixel = cur.getRGB((int) (nuclei[i].x),(int) (nuclei[i].y));
-				for(int xx=((int) (nuclei[i].x))-4;xx<((int) (nuclei[i].x))+4;xx++)
+				if(pixel != Color.BLACK.getRGB())
 				{
-					for(int yy=((int) (nuclei[i].y))-4;yy<((int) (nuclei[i].y))+4;yy++)
+					for(int xx=((int) (nuclei[i].x))-4;xx<((int) (nuclei[i].x))+4;xx++)
 					{
-						if(cur.getRGB(xx,yy)==pixel)
-							edit.setRGB(xx,yy,0);
+						for(int yy=((int) (nuclei[i].y))-4;yy<((int) (nuclei[i].y))+4;yy++)
+						{
+							if((cur.getRGB(xx,yy)==pixel))
+								edit.setRGB(xx,yy,0);
+						}
 					}
+					images[Integer.parseInt(nuclei[i].image)-1] = edit;
 				}
-				images[Integer.parseInt(nuclei[i].image)-1] = edit;
 			}
 		}
 
@@ -184,15 +187,18 @@ public class Filter
 				BufferedImage edit = images[Integer.parseInt(nuclei[i].image)-1];
 
 				int pixel = cur.getRGB((int) (nuclei[i].x),(int) (nuclei[i].y));
-				for(int xx=((int) (nuclei[i].x))-4;xx<((int) (nuclei[i].x))+4;xx++)
+				if(pixel != Color.BLACK.getRGB())
 				{
-					for(int yy=((int) (nuclei[i].y))-4;yy<((int) (nuclei[i].y))+4;yy++)
+					for(int xx=((int) (nuclei[i].x))-4;xx<((int) (nuclei[i].x))+4;xx++)
 					{
-						if(cur.getRGB(xx,yy)==pixel)
-							edit.setRGB(xx,yy,0);
+						for(int yy=((int) (nuclei[i].y))-4;yy<((int) (nuclei[i].y))+4;yy++)
+						{
+							if(cur.getRGB(xx,yy)==pixel)
+								edit.setRGB(xx,yy,0);
+						}
 					}
+					images[Integer.parseInt(nuclei[i].image)-1] = edit;	 
 				}
-				images[Integer.parseInt(nuclei[i].image)-1] = edit;	 
 			}
 		}	
 		System.out.println("Finished second filter. " + count + " nuclei removed.");
@@ -205,7 +211,7 @@ public class Filter
 		{
 			int white = new Color(255,255,255).getRGB();
 			int black = new Color(0,0,0).getRGB();
-			new File("output").mkdir();
+			new File(Global.outPath).mkdir();
 			for(int i=0;i<filenames.size();i++)
 			{
 				for(int j=0;j<images[i].getWidth();j++)
