@@ -43,8 +43,9 @@ public class Filter
 			i=last;
 		}
 		getImages();
-		//go();
+		go();
 		goAgain();
+		goAnew();
 		write_images();
 		write_csv();
 	}
@@ -142,6 +143,7 @@ public class Filter
 								edit.setRGB(xx,yy,0);
 						}
 					}
+					//edit.setRGB((int) (nuclei[i].x),(int) (nuclei[i].y), Color.RED.getRGB());
 					images[Integer.parseInt(nuclei[i].image)-1] = edit;
 				}
 			}
@@ -197,11 +199,73 @@ public class Filter
 								edit.setRGB(xx,yy,0);
 						}
 					}
+					//edit.setRGB((int) (nuclei[i].x),(int) (nuclei[i].y), Color.YELLOW.getRGB());
 					images[Integer.parseInt(nuclei[i].image)-1] = edit;	 
 				}
 			}
 		}	
 		System.out.println("Finished second filter. " + count + " nuclei removed.");
+	}
+
+	void goAnew()
+	{
+		System.out.println("Starting third filter.");
+		int count = 0;
+
+		for(int i=0;i<nuclei.length;i++)
+		{
+			boolean del = false;
+			BufferedImage cur = images[Integer.parseInt(nuclei[i].image)-1];
+			int pixel = cur.getRGB((int) (nuclei[i].x),(int) (nuclei[i].y));
+
+			if(pixel != Color.BLACK.getRGB())
+			{
+				for(int xx=((int) (nuclei[i].x))-4;xx<((int) (nuclei[i].x))+4;xx++)
+				{
+					for(int yy=((int) (nuclei[i].y))-4;yy<((int) (nuclei[i].y))+4;yy++)
+					{
+						if(cur.getRGB(xx,yy)==pixel)
+						{
+							int n_count = 0;
+							for(int px=xx-1;px<xx+2;px++)
+							{
+								for(int py=yy-1;py<yy+2;py++)
+								{
+									if(cur.getRGB(px,py)==cur.getRGB(xx,yy))
+										n_count++;
+								}
+							}
+							if(n_count<4)
+								del = true;
+						}
+					}
+				}
+			}
+
+			if(del)
+			{
+				count++;
+				Global.csvfile[i][1] = "-1";
+
+				BufferedImage edit = images[Integer.parseInt(nuclei[i].image)-1];
+
+				if(pixel != Color.BLACK.getRGB())
+				{
+					for(int xx=((int) (nuclei[i].x))-4;xx<((int) (nuclei[i].x))+4;xx++)
+					{
+						for(int yy=((int) (nuclei[i].y))-4;yy<((int) (nuclei[i].y))+4;yy++)
+						{
+							if(cur.getRGB(xx,yy)==pixel)
+								edit.setRGB(xx,yy,0);
+						}
+					}
+					//edit.setRGB((int) (nuclei[i].x),(int) (nuclei[i].y), Color.ORANGE.getRGB());
+					images[Integer.parseInt(nuclei[i].image)-1] = edit;
+				}
+			}		
+		}
+		System.out.println("Finished third filter. " + count + " nuclei removed.");
+
 	}
 
 	void write_images()
@@ -218,6 +282,7 @@ public class Filter
 				{
 					for(int k=0;k<images[i].getHeight();k++)
 					{
+						//images[i].setRGB(j,k,images[i].getRGB(j,k));
 						if(images[i].getRGB(j,k)!=black)
 							images[i].setRGB(j,k,white);
 					}
