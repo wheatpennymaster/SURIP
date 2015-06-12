@@ -10,11 +10,11 @@ import java.util.LinkedList;
 
 public class driver
 {
-	static String[][] read_csv(String filename)
+	static ArrayList<String[]> read_csv(String filename)
 	{
 		BufferedReader br = null;
 		String line = "";
-		LinkedList<String[]>l = new LinkedList<String[]>();
+		ArrayList<String[]>l = new ArrayList<String[]>();
 
 		try
 		{
@@ -37,11 +37,7 @@ public class driver
 			}
 		}
 
-		String[][]out = new String[l.size()][4];
-		for(int i=0;i<out.length;i++)
-			out[i] = l.get(i);
-
-		return out;
+		return l;
 	}
 
 	static ArrayList<String> getImageNames()
@@ -79,12 +75,12 @@ public class driver
 
 			System.out.println("Reading in .csv and image filenames.");
 
-			String[][]input = read_csv(args[2]);
+			ArrayList<String[]>input = read_csv(args[2]);
 			Global.csvfile = input;
 
 			ArrayList<Nuclei>nuclei = new ArrayList<Nuclei>();
-			for(int i=1;i<input.length;i++)
-				nuclei.add(new Nuclei(input[i]));
+			for(int i=1;i<input.size();i++)
+				nuclei.add(new Nuclei(input.get(i)));
 
 			ArrayList<String> imageNames = getImageNames();
 
@@ -108,7 +104,6 @@ public class driver
 			}
 
 			System.out.println("Successfully read .csv and read image filenames.");
-
 			new Filter(nuclei, imageNames);
 
 		}

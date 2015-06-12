@@ -43,8 +43,8 @@ public class Filter
 			i=last;
 		}
 		getImages();
-		go();
-		goAgain();
+		//go();
+		//goAgain();
 		goAnew();
 		write_images();
 		write_csv();
@@ -306,9 +306,9 @@ public class Filter
 		System.out.println("Writing csv.");
 		try
 		{
-			String filename = Global.csv;
+			String filename = "output.csv";
 			File file = new File(Global.outPath + filename);
-			if (!file.exists())
+				file.delete();
 				file.createNewFile();
 			FileWriter fw = new FileWriter(file.getAbsoluteFile());
 			BufferedWriter bw = new BufferedWriter(fw);
@@ -324,6 +324,8 @@ public class Filter
 					bw.write(writeMe + "\n");
 				}
 			}
+			bw.close();
+			fw.close();
 		} catch(Exception e){}
 				
 		System.out.println("Finished writing csv.");			

@@ -67,66 +67,58 @@ public class check
                 return resultList;
         }
 
-        static BufferedImage[] getImages(ArrayList<String>filenames)
+        static BufferedImage getImages(ArrayList<String>filenames, int q)
         {
-		BufferedImage[]images = new BufferedImage[filenames.size()];
-                for(int i=0;i<filenames.size();i++)
-                {
-                        BufferedImage in = null;
+		BufferedImage image = null;
                         try
                         {
-                                in = ImageIO.read(new File(filenames.get(i)));
-                                images[i] = in;
+                                image = ImageIO.read(new File(filenames.get(q)));
                         }
                         catch(Exception e){e.printStackTrace();}
-                }
-                System.out.println("Successfully read images.");
-		return images;
+		return image;
         }
 
 
 	public static void main(String[]args)
 	{
-		String[][]csv1 = read_csv("output1/input.csv");
-		String[][]csv2 = read_csv("output2/input.csv");
-		ArrayList<String>imageNames1 = getImageNames("output1/");
-		ArrayList<String>imageNames2 = getImageNames("output2/");
-		BufferedImage[]images1 = getImages(imageNames1);
-		BufferedImage[]images2 = getImages(imageNames2);
+		String[][]csv1 = read_csv("/Users/thomas/SURIP/jfilter/output/output.csv");
+		String[][]csv2 = read_csv("/Users/thomas/SURIP/jfilter_overhaul/output/output.csv");
+		ArrayList<String>imageNames1 = getImageNames("/Users/thomas/SURIP/jfilter/output/");
+		ArrayList<String>imageNames2 = getImageNames("/Users/thomas/SURIP/jfilter_overhaul/output/");
 
 		if(csv1.length != csv2.length)
 		{
 			System.out.println("Fuck columns");
 			System.exit(0);
 		}
-		if(csv1[0].length != csv2[0].length);
+	/*	for(int i=0;i<csv1.length;i++)
 		{
-			System.out.println("Fuck rows");
-			System.exit(0);
+			if(csv1[i].length != csv2[i].length);
+			{
+				System.out.println("Fuck rows " + i + " " + csv1[i].length + " " + csv2[i].length);
+				System.exit(0);
+			}
 		}
-		for(int i=0;i<csv1.length;i++)
+	*/	for(int i=0;i<csv1.length;i++)
 		{
 			for(int j=0;j<csv1[i].length;j++)
 			{
 				if(!(csv1[i][j].equals(csv2[i][j]))) {
-					System.out.println("Fuck the csv");
+					System.out.println("Fuck the csv at " + i + " " + j);
 					System.exit(0);
 				}
 			}
 		}
 
-		if(images1.length!=images2.length)
-		{
-			System.out.println("Fuck images");
-			System.exit(0);
-		}
-                for(int i=0;i<images1.length;i++)
+                for(int q=0;q<imageNames1.size();q++)
                 {
-                        for(int j=0;j<images1[i].getWidth();j++)
+			BufferedImage image1 = getImages(imageNames1,q);
+			BufferedImage image2 = getImages(imageNames2,q);
+                        for(int j=0;j<image1.getWidth();j++)
                         {
-                                for(int k=0;k<images1[i].getHeight();k++)
+                                for(int k=0;k<image1.getHeight();k++)
 				{
-					if(images1[i].getRGB(j,k)!=images2[i].getRGB(j,k))
+					if(image1.getRGB(j,k)!=image2.getRGB(j,k))
 					{
 						System.out.println("Fuck this program");
 						System.exit(0);
@@ -134,6 +126,6 @@ public class check
 				}
 			}
 		}
-		System.out.println("You luck bastard");
+		System.out.println("You lucky bastard");
 	}
 }

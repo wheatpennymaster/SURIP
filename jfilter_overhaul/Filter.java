@@ -40,9 +40,11 @@ public class Filter
 			i=last;
 		}
 		getImages();
+
 		go();
-		goAgain();
 		goAnew();
+		goAgain();
+
 		write_images();
 		write_csv();
 	}
@@ -122,7 +124,6 @@ public class Filter
 			if(del)
 			{	//4 pixel square
 				count++;
-				Global.csvfile[i][1] = "-1";
 				//System.out.println("Removing nuclei " + nuclei.get(i).number + " from image " + nuclei.get(i).image + " by editing file " + filenames.get(Integer.parseInt(nuclei.get(i).image)-1) );
 
 				BufferedImage cur = images[Integer.parseInt(nuclei.get(i).image)-1];
@@ -142,6 +143,8 @@ public class Filter
 					//edit.setRGB((int) (nuclei.get(i).x),(int) (nuclei.get(i).y), Color.RED.getRGB());
 					images[Integer.parseInt(nuclei.get(i).image)-1] = edit;
 				}
+				remove(i);
+				i=i-1;
 			}
 		}
 
@@ -178,7 +181,6 @@ public class Filter
 			if(sum>Global.min_dist)
 			{
 				count++;
-				Global.csvfile[i][1] = "-1";
 				//System.out.println("Removing nuclei " + nuclei.get(i).number + " from image " + nuclei.get(i).image + " by editing file " + filenames.get(Integer.parseInt(nuclei.get(i).image)-1) );
 
 				BufferedImage cur = images[Integer.parseInt(nuclei.get(i).image)-1];
@@ -198,6 +200,8 @@ public class Filter
 					//edit.setRGB((int) (nuclei.get(i).x),(int) (nuclei.get(i).y), Color.YELLOW.getRGB());
 					images[Integer.parseInt(nuclei.get(i).image)-1] = edit;	 
 				}
+				remove(i);
+				i=i-1;
 			}
 		}	
 		System.out.println("Finished second filter. " + count + " nuclei removed.");
@@ -241,7 +245,6 @@ public class Filter
 			if(del)
 			{
 				count++;
-				Global.csvfile[i][1] = "-1";
 
 				BufferedImage edit = images[Integer.parseInt(nuclei.get(i).image)-1];
 
@@ -258,10 +261,28 @@ public class Filter
 					//edit.setRGB((int) (nuclei.get(i).x),(int) (nuclei.get(i).y), Color.ORANGE.getRGB());
 					images[Integer.parseInt(nuclei.get(i).image)-1] = edit;
 				}
+				remove(i);
+				i=i-1;
 			}		
 		}
 		System.out.println("Finished third filter. " + count + " nuclei removed.");
 
+	}
+
+	void remove(int i)
+	{
+		for(int j=0;j<i_nuclei[Integer.parseInt(nuclei.get(i).image)].nuclei.size();j++)
+		{
+			if(i_nuclei[Integer.parseInt(nuclei.get(i).image)].nuclei.get(j).number==nuclei.get(i).number)
+			{
+				i_nuclei[Integer.parseInt(nuclei.get(i).image)].nuclei.remove(j);
+				break;
+			}
+		}
+		if(i_nuclei[Integer.parseInt(nuclei.get(i).image)].nuclei.size()==0)
+			i_nuclei[Integer.parseInt(nuclei.get(i).image)]=null;
+		nuclei.remove(i);
+		Global.csvfile.remove(i);
 	}
 
 	void write_images()
@@ -302,25 +323,25 @@ public class Filter
 		System.out.println("Writing csv.");
 		try
 		{
-			String filename = Global.csv;
+			String filename = "output.csv";
 			File file = new File(Global.outPath + filename);
-			if (!file.exists())
-				file.createNewFile();
+				file.delete();
+				file.createNewFile();	
 			FileWriter fw = new FileWriter(file.getAbsoluteFile());
 			BufferedWriter bw = new BufferedWriter(fw);
-			for(int i=0;i<Global.csvfile.length;i++)
+			for(int i=0;i<Global.csvfile.size();i++)
 			{
 				String writeMe = "";
-				if(!(Global.csvfile[i][1].equals("-1")))
+				String[]temp = Global.csvfile.get(i);
+				for(int j=0;j<temp.length;j++)
 				{
-					for(int j=0;j<Global.csvfile[i].length;j++)
-					{
-						writeMe = writeMe + Global.csvfile[i][j] + ",";
-					}
-					bw.write(writeMe + "\n");
+					writeMe = writeMe + temp[j] + ",";
 				}
+				bw.write(writeMe + "\n");
 			}
-		} catch(Exception e){}
+			bw.close();
+			fw.close();
+		} catch(Exception e){e.printStackTrace();}
 				
 		System.out.println("Finished writing csv.");			
 	}

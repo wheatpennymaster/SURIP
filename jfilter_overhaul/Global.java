@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class Global
 {
 	//for filter 1, go()
@@ -12,6 +14,6 @@ public class Global
 	public static String csv = "";
 	public static String inPath = "";
 	public static String outPath = "";
-	public static String[][] csvfile;
+	public static ArrayList<String[]> csvfile;
 }
 	
