@@ -23,9 +23,9 @@ public class Filter
 	{
 		this.nuclei=nuclei;
 		this.filenames=filenames;
-		images = new BufferedImage[filenames.size()];
+		images = new BufferedImage[filenames.size()+1];
 
-		i_nuclei = new Image_nuclei[filenames.size()];
+		i_nuclei = new Image_nuclei[filenames.size()+1];
 		for(int i=0;i<nuclei.size();i++)
 		{
 			int cur_image = Integer.parseInt(nuclei.get(i).image);
@@ -41,7 +41,7 @@ public class Filter
 		}
 		getImages();
 
-		go();
+		//go();
 		goAnew();
 		goAgain();
 
