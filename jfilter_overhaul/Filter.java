@@ -23,10 +23,10 @@ public class Filter
 	{
 		this.nuclei=nuclei;
 		this.filenames=filenames;
-		images = new BufferedImage[filenames.size()+1];
+		images = new BufferedImage[filenames.size()+1+1];	//0-th entry is null to allow indexing by image number; n-th index is null for filter 1)
 
-		i_nuclei = new Image_nuclei[filenames.size()+1];
-		for(int i=0;i<nuclei.size();i++)
+		i_nuclei = new Image_nuclei[filenames.size()+1+1];	//0-th entry is null to allow indexing by image number; n-th index is null for filter 1)
+		for(int i=0;i<nuclei.size();i++)			//building the structure i_nuclei[] which keeps a list of objects for a given image, indexed by the image number
 		{
 			int cur_image = Integer.parseInt(nuclei.get(i).image);
 			int last = i;
@@ -41,17 +41,102 @@ public class Filter
 		}
 		getImages();
 
-		//go();
-		goAnew();
-		goAgain();
+		int cc = 0;
+		for(int i=0;i<nuclei.size();i++)
+		{
+			BufferedImage cur = images[Integer.parseInt(nuclei.get(i).image)-1];
+			int pixel = cur.getRGB((int) (nuclei.get(i).x),(int) (nuclei.get(i).y));
+			if(pixel==Color.BLACK.getRGB())
+				remove(i);
+		}
+		filter();
 
 		write_images();
 		write_csv();
+
+		new Count(nuclei,filenames);
 	}
 
+	//chooses a which filters to use and in what order based on command line argument
+	void filter()
+	{
+		switch(Global.f_order)
+		{
+			case "123":
+				go();
+				goAgain();
+				goAnew();
+				break;
+			case "132":
+				go();
+				goAnew();
+				goAgain();
+				break;
+			case "213":
+				goAgain();
+				go();
+				goAnew();
+				break;
+			case "231":
+				goAgain();
+				goAnew();
+				go();
+				break;
+			case "312":
+				goAnew();
+				go();
+				goAgain();
+				break;
+			case "321":
+				goAnew();
+				goAgain();
+				go();
+				break;
+			case "12":
+				go();
+				goAgain();
+				break;
+			case "13":
+				go();
+				goAnew();
+				break;
+			case "21":
+				goAgain();
+				go();
+				break;
+			case "23":
+				goAgain();
+				goAnew();
+				break;
+			case "31":
+				goAnew();
+				go();
+				break;
+			case "32":
+				goAnew();
+				goAgain();
+				break;
+			case "1":
+				go();
+				break;
+			case "2":
+				goAgain();
+				break;
+			case "3":
+				goAnew();
+				break;
+			default:
+				go();
+				goAnew();
+				goAgain();
+				break;
+		}
+	}
+
+	//this filters out objects that only appear on one image slice; a command line value is given to specify what is considered the same object across images 
 	void go()
 	{
-		System.out.println("Starting filter.");
+		System.out.println("Starting first filter.");
 		int count = 0;
 		for(int i=0;i<nuclei.size();i++)
 		{
@@ -66,37 +151,72 @@ public class Filter
 			}
 			else if(ln==null)								//no image in preceding slice
 			{
-				for(int j=0;j<un.nuclei.size();j++)
+				Image_nuclei uun = i_nuclei[Integer.parseInt(nuclei.get(i).image)+2];
+				if(uun==null)
+					del=true;
+				else
 				{
-					double ux_diff = Math.abs(un.nuclei.get(j).x - nuclei.get(i).x);
-					double uy_diff = Math.abs(un.nuclei.get(j).y - nuclei.get(i).y);
-					double u_dist = Math.pow( Math.pow(ux_diff,2) + Math.pow(uy_diff,2) , .5);
-
-					if(u_dist <= Global.dist)
+					for(int j=0;j<un.nuclei.size();j++)					//comparing the current object to all the objects on the succeeding slice
 					{
-						del = false;
-						break;
+						double ux_diff = Math.abs(un.nuclei.get(j).x - nuclei.get(i).x);
+						double uy_diff = Math.abs(un.nuclei.get(j).y - nuclei.get(i).y);
+						double u_dist = Math.pow( Math.pow(ux_diff,2) + Math.pow(uy_diff,2) , .5);
+
+						if(u_dist <= Global.dist)
+						{
+							for(int jj=0;jj<uun.nuclei.size();jj++)
+							{
+								double uux_diff = Math.abs(un.nuclei.get(j).x - uun.nuclei.get(jj).x);
+								double uuy_diff = Math.abs(un.nuclei.get(j).y - uun.nuclei.get(jj).y);
+								double uu_dist = Math.pow( Math.pow(uux_diff,2) + Math.pow(uuy_diff,2) , .5);
+								if(uu_dist <= Global.dist)
+								{
+									del=false;
+									break;
+								}
+							}
+							if(!del)
+								break;
+						}
 					}
 				}
 			}
 			else if(un==null)								//no image in succeeding slice
 			{
-				for(int j=0;j<ln.nuclei.size();j++)
+				Image_nuclei lln = i_nuclei[Integer.parseInt(nuclei.get(i).image)-2];
+				if(lln==null)
+					del=true;
+				else
 				{
-					double lx_diff = Math.abs(ln.nuclei.get(j).x - nuclei.get(i).x);
-					double ly_diff = Math.abs(ln.nuclei.get(j).y - nuclei.get(i).y);
-					double l_dist = Math.pow( Math.pow(lx_diff,2) + Math.pow(ly_diff,2) , .5);
-
-					if(l_dist <= Global.dist)
+					for(int j=0;j<ln.nuclei.size();j++)					//comparing the current object to all the objects on the preceding slice
 					{
-						del = false;
-						break;
+						double lx_diff = Math.abs(ln.nuclei.get(j).x - nuclei.get(i).x);
+						double ly_diff = Math.abs(ln.nuclei.get(j).y - nuclei.get(i).y);
+						double l_dist = Math.pow( Math.pow(lx_diff,2) + Math.pow(ly_diff,2) , .5);
+
+						if(l_dist <= Global.dist)
+						{
+							for(int jj=0;jj<lln.nuclei.size();jj++)
+							{
+								double llx_diff = Math.abs(ln.nuclei.get(j).x - lln.nuclei.get(jj).x);
+								double lly_diff = Math.abs(ln.nuclei.get(j).y - lln.nuclei.get(jj).y);
+								double ll_dist = Math.pow( Math.pow(llx_diff,2) + Math.pow(lly_diff,2) , .5);
+
+								if(ll_dist <= Global.dist)
+								{
+									del = false;
+									break;
+								}
+							}
+							if(!del)
+								break;
+						}
 					}
 				}
 			}
 			else										//image in both preceding and succeeding slice
 			{
-				for(int j=0;j<ln.nuclei.size();j++)
+				for(int j=0;j<ln.nuclei.size();j++)					//comparing the current object to all the objects on the preceding slice
 				{
 					double lx_diff = Math.abs(ln.nuclei.get(j).x - nuclei.get(i).x);
 					double ly_diff = Math.abs(ln.nuclei.get(j).y - nuclei.get(i).y);
@@ -108,7 +228,7 @@ public class Filter
 						break;
 					}
 				}
-				for(int j=0;j<un.nuclei.size();j++)
+				for(int j=0;j<un.nuclei.size();j++)					//comparing the current object to all the objects on the succeeding slice
 				{
 					double ux_diff = Math.abs(un.nuclei.get(j).x - nuclei.get(i).x);
 					double uy_diff = Math.abs(un.nuclei.get(j).y - nuclei.get(i).y);
@@ -122,7 +242,7 @@ public class Filter
 				}
 			}
 			if(del)
-			{	//4 pixel square
+			{	//if it is determined that a nucleus should be removed, we blackout 7x7 pixel square around the center of the object
 				count++;
 				//System.out.println("Removing nuclei " + nuclei.get(i).number + " from image " + nuclei.get(i).image + " by editing file " + filenames.get(Integer.parseInt(nuclei.get(i).image)-1) );
 
@@ -132,9 +252,9 @@ public class Filter
 				int pixel = cur.getRGB((int) (nuclei.get(i).x),(int) (nuclei.get(i).y));
 				if(pixel != Color.BLACK.getRGB())
 				{
-					for(int xx=((int) (nuclei.get(i).x))-4;xx<((int) (nuclei.get(i).x))+4;xx++)
+					for(int xx=((int) (nuclei.get(i).x))-4;(xx<((int) (nuclei.get(i).x))+4) && (xx>-1) && (xx<cur.getWidth());xx++)
 					{
-						for(int yy=((int) (nuclei.get(i).y))-4;yy<((int) (nuclei.get(i).y))+4;yy++)
+						for(int yy=((int) (nuclei.get(i).y))-4;(yy<((int) (nuclei.get(i).y))+4) && (yy>-1) && (yy<cur.getHeight());yy++)
 						{
 							if((cur.getRGB(xx,yy)==pixel))
 								edit.setRGB(xx,yy,0);
@@ -144,13 +264,15 @@ public class Filter
 					images[Integer.parseInt(nuclei.get(i).image)-1] = edit;
 				}
 				remove(i);
-				i=i-1;
+				i=i-1;		//we decrement i because an object has been removed from arraylist nuclei
 			}
 		}
 
-		System.out.println("Finished filter. " + count + " nuclei removed.");
+		System.out.println("Finished first filter. " + count + " nuclei removed.");
 	}
 
+	//filters out objects that are far away from other objects; an image must first have a specified number of objects, then it finds a specified number of closest neighbors and sums the distance 
+	//between the current object and the neighbors; if this sum is above a specified threshold, the object is removed
 	void goAgain()
 	{
 		System.out.println("Starting second filter.");
@@ -162,23 +284,23 @@ public class Filter
 			for(int m=0;m<mins.length;m++)
 				mins[m] = Double.MAX_VALUE;
 			double sum = 0;
-			if(i_nuclei[Integer.parseInt(nuclei.get(i).image)].nuclei.size() > Global.min_neighbors)
+			if(i_nuclei[Integer.parseInt(nuclei.get(i).image)].nuclei.size() > Global.min_neighbors)	//we want a mininmum number of objects in the image to avoid end cases
 			{
-				for(int j=0;j<i_nuclei[Integer.parseInt(nuclei.get(i).image)].nuclei.size();j++)
+				for(int j=0;j<i_nuclei[Integer.parseInt(nuclei.get(i).image)].nuclei.size();j++)	//finding closest neighbors
 				{
 					double dadist = Math.pow( Math.pow(nuclei.get(i).x - i_nuclei[Integer.parseInt(nuclei.get(i).image)].nuclei.get(j).x,2) + Math.pow(nuclei.get(i).y - i_nuclei[Integer.parseInt(nuclei.get(i).image)].nuclei.get(j).y,2),.5);
 					Arrays.sort(mins);
 					if(mins[mins.length-1]>dadist)
 						mins[mins.length-1] = dadist;
 				}
-				for(int j=0;j<mins.length;j++)
+				for(int j=0;j<mins.length;j++)	//summing distances between current object and closests neighbors
 				{
 					sum = sum + mins[j];
 					//System.out.println(sum);
 				}
 			}
 			//System.out.println(sum);
-			if(sum>Global.min_dist)
+			if(sum>Global.min_dist)		//deleting
 			{
 				count++;
 				//System.out.println("Removing nuclei " + nuclei.get(i).number + " from image " + nuclei.get(i).image + " by editing file " + filenames.get(Integer.parseInt(nuclei.get(i).image)-1) );
@@ -189,9 +311,9 @@ public class Filter
 				int pixel = cur.getRGB((int) (nuclei.get(i).x),(int) (nuclei.get(i).y));
 				if(pixel != Color.BLACK.getRGB())
 				{
-					for(int xx=((int) (nuclei.get(i).x))-4;xx<((int) (nuclei.get(i).x))+4;xx++)
+					for(int xx=((int) (nuclei.get(i).x))-4;(xx<((int) (nuclei.get(i).x))+4)  && (xx>-1) && (xx<cur.getWidth());xx++)
 					{
-						for(int yy=((int) (nuclei.get(i).y))-4;yy<((int) (nuclei.get(i).y))+4;yy++)
+						for(int yy=((int) (nuclei.get(i).y))-4;(yy<((int) (nuclei.get(i).y))+4) && (yy>-1) && (yy<cur.getHeight());yy++)
 						{
 							if(cur.getRGB(xx,yy)==pixel)
 								edit.setRGB(xx,yy,0);
@@ -201,12 +323,13 @@ public class Filter
 					images[Integer.parseInt(nuclei.get(i).image)-1] = edit;	 
 				}
 				remove(i);
-				i=i-1;
+				i=i-1;	//we decrement i because an object has been removed from the arraylist nuclei
 			}
 		}	
 		System.out.println("Finished second filter. " + count + " nuclei removed.");
 	}
 
+	//filters out oddly shaped objects; if an object has a pixel that has fewer than a specified number of neighbors, the object is removed
 	void goAnew()
 	{
 		System.out.println("Starting third filter.");
@@ -222,7 +345,7 @@ public class Filter
 			{
 				for(int xx=((int) (nuclei.get(i).x))-4;xx<((int) (nuclei.get(i).x))+4;xx++)
 				{
-					for(int yy=((int) (nuclei.get(i).y))-4;yy<((int) (nuclei.get(i).y))+4;yy++)
+					for(int yy=((int) (nuclei.get(i).y))-4;(yy<((int) (nuclei.get(i).y))+4) && (yy>-1) && (yy<cur.getHeight());yy++)
 					{
 						if(cur.getRGB(xx,yy)==pixel)
 						{
@@ -235,7 +358,7 @@ public class Filter
 										n_count++;
 								}
 							}
-							if(n_count<4)
+							if(n_count<Global.min_pixel_n)
 								del = true;
 						}
 					}
@@ -250,9 +373,9 @@ public class Filter
 
 				if(pixel != Color.BLACK.getRGB())
 				{
-					for(int xx=((int) (nuclei.get(i).x))-4;xx<((int) (nuclei.get(i).x))+4;xx++)
+					for(int xx=((int) (nuclei.get(i).x))-4;(xx<((int) (nuclei.get(i).x))+4) && (xx>-1) && (xx<cur.getWidth());xx++)
 					{
-						for(int yy=((int) (nuclei.get(i).y))-4;yy<((int) (nuclei.get(i).y))+4;yy++)
+						for(int yy=((int) (nuclei.get(i).y))-4;(yy<((int) (nuclei.get(i).y))+4) && (yy>-1) && (yy<cur.getHeight());yy++)
 						{
 							if(cur.getRGB(xx,yy)==pixel)
 								edit.setRGB(xx,yy,0);
@@ -269,6 +392,7 @@ public class Filter
 
 	}
 
+	//removes an object from all associated data structures. 
 	void remove(int i)
 	{
 		for(int j=0;j<i_nuclei[Integer.parseInt(nuclei.get(i).image)].nuclei.size();j++)
@@ -282,7 +406,7 @@ public class Filter
 		if(i_nuclei[Integer.parseInt(nuclei.get(i).image)].nuclei.size()==0)
 			i_nuclei[Integer.parseInt(nuclei.get(i).image)]=null;
 		nuclei.remove(i);
-		Global.csvfile.remove(i);
+		Global.csvfile.remove(i+1);
 	}
 
 	void write_images()
@@ -348,6 +472,7 @@ public class Filter
 
 	void getImages()
 	{
+		System.out.println("Reading images");
 		for(int i=0;i<filenames.size();i++)
 		{
 			BufferedImage in = null;

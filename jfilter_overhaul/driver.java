@@ -56,24 +56,31 @@ public class driver
 		catch (IOException e) { e.printStackTrace(); }
 
 		return resultList;
-	}		
+	}
+
+	static void getArguments(String[]args)
+	{
+		
+	}
 
 	public static void main(String[]args)
 	{
 		//java driver inPath outPath input_csv.csv dist num_neighbors min_neighbors min_dist
-		if(args.length < 7)
+		if(args.length < 9)
 			System.out.println("Usage:\njava driver inPath outPath path_to_input_csv.csv dist");
 		else
 		{
 			Global.inPath = args[0];
 			Global.outPath = args[1];
-			Global.dist = Double.parseDouble(args[3]);
 			Global.csv = args[2];
+			Global.dist = Double.parseDouble(args[3]);
 			Global.num_neighbors = Integer.parseInt(args[4]);
 			Global.min_neighbors = Integer.parseInt(args[5]);
 			Global.min_dist = Double.parseDouble(args[6]);
+			Global.min_pixel_n = Integer.parseInt(args[7]);
+			Global.f_order = args[8];
 
-			System.out.println("Reading in .csv and image filenames.");
+			System.out.println("Started reading in .csv and image filenames.");
 
 			ArrayList<String[]>input = read_csv(args[2]);
 			Global.csvfile = input;
@@ -103,7 +110,7 @@ public class driver
 				nuclei.set(i,new Nuclei(nn));
 			}
 
-			System.out.println("Successfully read .csv and read image filenames.");
+			System.out.println("Finished reading in .csv and read image filenames.");
 			new Filter(nuclei, imageNames);
 
 		}
