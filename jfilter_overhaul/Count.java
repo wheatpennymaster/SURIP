@@ -69,7 +69,8 @@ public class Count
 				{
 					for(int j=0;j<un.nuclei.size();j++)
 					{
-						if( (Math.abs(un.nuclei.get(j).x - nuclei.get(i).x)<dist) && (Math.abs(un.nuclei.get(j).y - nuclei.get(i).y)<dist) )
+						double d = Math.pow( Math.pow( Math.abs(un.nuclei.get(j).x - nuclei.get(i).x), 2) + Math.pow( Math.abs(un.nuclei.get(j).y - nuclei.get(i).y), 2), .5);
+						if(d<dist)
 						{
 							nodes[i].un = new Node(un.nuclei.get(j),un.nuclei.get(j).index);
 							test++;//break;
@@ -91,7 +92,8 @@ public class Count
 				{
 					for(int j=0;j<ln.nuclei.size();j++)
 					{
-						if( (Math.abs(ln.nuclei.get(j).x - nuclei.get(i).x)<dist) && (Math.abs(ln.nuclei.get(j).y - nuclei.get(i).y)<dist) )
+						double d = Math.pow( Math.pow( Math.abs(ln.nuclei.get(j).x - nuclei.get(i).x), 2) + Math.pow( Math.abs(ln.nuclei.get(j).y - nuclei.get(i).y), 2), .5);
+						if(d<dist)
 						{
 							nodes[i].ln = new Node(ln.nuclei.get(j),ln.nuclei.get(j).index);
 							test++;//break;
@@ -113,7 +115,8 @@ public class Count
 				{
 					for(int j=0;j<un.nuclei.size();j++)
 					{
-						if( (Math.abs(un.nuclei.get(j).x - nuclei.get(i).x)<dist) && (Math.abs(un.nuclei.get(j).y - nuclei.get(i).y)<dist) )
+						double d = Math.pow( Math.pow( Math.abs(un.nuclei.get(j).x - nuclei.get(i).x), 2) + Math.pow( Math.abs(un.nuclei.get(j).y - nuclei.get(i).y), 2), .5);
+						if(d<dist)
 						{
 							nodes[i].un = new Node(un.nuclei.get(j),un.nuclei.get(j).index);
 							test++;//break;
@@ -133,7 +136,8 @@ public class Count
 				{
 					for(int j=0;j<ln.nuclei.size();j++)
 					{
-						if( (Math.abs(ln.nuclei.get(j).x - nuclei.get(i).x)<dist) && (Math.abs(ln.nuclei.get(j).y - nuclei.get(i).y)<dist) )
+						double d = Math.pow( Math.pow( Math.abs(ln.nuclei.get(j).x - nuclei.get(i).x), 2) + Math.pow( Math.abs(ln.nuclei.get(j).y - nuclei.get(i).y), 2), .5);
+						if(d<dist)
 						{
 							nodes[i].ln = new Node(ln.nuclei.get(j),ln.nuclei.get(j).index);
 							test++;//break;
@@ -151,7 +155,7 @@ public class Count
 	{
 		//System.out.print(nodes[i].n.image + " (" + nodes[i].n.x + "," + nodes[i].n.y + ") ");
 		String[]temp = Global.csvfile.get(i+1);
-		System.out.print(new DecimalFormat("#.##").format(Double.parseDouble(temp[2])) + "\t");
+		System.out.print(new DecimalFormat("#.##").format(Double.parseDouble(temp[2])) + ",");
 		if(nodes[i].un==null)
 		{
 			System.out.println();

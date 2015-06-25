@@ -51,7 +51,7 @@ public class Filter
 		}
 		filter();
 
-		write_images();
+		//write_images();
 		write_csv();
 
 		new Count(nuclei,filenames);
@@ -125,6 +125,8 @@ public class Filter
 			case "3":
 				goAnew();
 				break;
+			case "0":
+				break;
 			default:
 				go();
 				goAnew();
@@ -169,11 +171,11 @@ public class Filter
 								double uux_diff = Math.abs(un.nuclei.get(j).x - uun.nuclei.get(jj).x);
 								double uuy_diff = Math.abs(un.nuclei.get(j).y - uun.nuclei.get(jj).y);
 								double uu_dist = Math.pow( Math.pow(uux_diff,2) + Math.pow(uuy_diff,2) , .5);
-								if(uu_dist <= Global.dist)
-								{
+								//if(uu_dist <= Global.dist)
+								//{
 									del=false;
 									break;
-								}
+								//}
 							}
 							if(!del)
 								break;
@@ -202,11 +204,11 @@ public class Filter
 								double lly_diff = Math.abs(ln.nuclei.get(j).y - lln.nuclei.get(jj).y);
 								double ll_dist = Math.pow( Math.pow(llx_diff,2) + Math.pow(lly_diff,2) , .5);
 
-								if(ll_dist <= Global.dist)
-								{
+								//if(ll_dist <= Global.dist)
+								//{
 									del = false;
 									break;
-								}
+								//}
 							}
 							if(!del)
 								break;
