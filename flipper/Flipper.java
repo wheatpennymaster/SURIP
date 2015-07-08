@@ -70,7 +70,7 @@ public class Flipper extends JComponent implements KeyListener
 			File[] f = new File(inPath).listFiles();
 			for (File file : f)
 			{
-				if (file != null && file.getName().toLowerCase().endsWith(".png"))
+				if (file != null && (file.getName().toLowerCase().endsWith(".png") || file.getName().toLowerCase().endsWith(".jpg")))
 					resultList.add(file.getCanonicalPath());
 			}
 		}

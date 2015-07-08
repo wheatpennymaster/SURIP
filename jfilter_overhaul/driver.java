@@ -111,6 +111,7 @@ public class driver
 			}
 
 			System.out.println("Finished reading in .csv and read image filenames.");
+			System.out.println(nuclei.get(0).x);
 			new Filter(nuclei, imageNames);
 
 		}

@@ -39,9 +39,10 @@ public class Filter
 			i_nuclei[cur_image] = new Image_nuclei(temp);
 			i=last;
 		}
-		getImages();
+		//getImages();
 
 		int cc = 0;
+		/*
 		for(int i=0;i<nuclei.size();i++)
 		{
 			BufferedImage cur = images[Integer.parseInt(nuclei.get(i).image)-1];
@@ -49,12 +50,14 @@ public class Filter
 			if(pixel==Color.BLACK.getRGB())
 				remove(i);
 		}
-		filter();
+		*/
+		//filter();
 
 		//write_images();
-		write_csv();
+		//write_csv();
 
 		new Count(nuclei,filenames);
+		//new Gradient(nuclei, images, filenames);
 	}
 
 	//chooses a which filters to use and in what order based on command line argument

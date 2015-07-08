@@ -1,6 +1,7 @@
 #ignore picture folder
 zf_eye_nuclei_segmentation
 transcriptions
+NIH_film
 
 #ignore output
 *.csv
@@ -8,3 +9,5 @@ transcriptions
 *.tif
 *.png
 *.swp
+*.jpg
+*.avi
